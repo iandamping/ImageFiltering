@@ -86,7 +86,7 @@ class EditImageFragment : Fragment(), EditImageView, SeekBar.OnSeekBarChangeList
 
     fun resetControls() {
         actualView.sbBrightness.setProgress(100)
-        actualView.sbCntrast.setProgress(0)
-        actualView.sbSaturation.setProgress(10)
+        actualView.sbCntrast.setProgress(100)
+        actualView.sbSaturation.setProgress(100)
     }
 }
