@@ -1,4 +1,4 @@
-package com.example.junemon.filteringimage.adapter
+package com.example.junemon.filteringimage.ui.adapter
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager

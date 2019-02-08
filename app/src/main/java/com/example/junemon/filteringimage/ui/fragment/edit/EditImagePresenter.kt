@@ -3,6 +3,7 @@ package com.example.junemon.filteringimage.ui.fragment.edit
 import android.content.Context
 import android.view.View
 import com.example.junemon.filteringimage.base.BaseFragmentPresenter
+
 /**
  * Created by ian on 07/02/19.
  */

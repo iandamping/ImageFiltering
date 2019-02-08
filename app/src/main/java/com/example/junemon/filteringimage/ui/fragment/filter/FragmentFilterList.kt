@@ -11,10 +11,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.junemon.filteringimage.R
-import com.example.junemon.filteringimage.adapter.ThumbnailsAdapter
 import com.example.junemon.filteringimage.helper.SpacesItemDecoration
+import com.example.junemon.filteringimage.ui.adapter.ThumbnailsAdapter
 import com.zomato.photofilters.utils.ThumbnailItem
 import kotlinx.android.synthetic.main.fragment_filter_list.view.*
+
 /**
  * Created by ian on 07/02/19.
  */

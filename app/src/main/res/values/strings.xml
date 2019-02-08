@@ -16,4 +16,8 @@
     <string name="filter_normal">Normal</string>
     <string name="action_save">SAVE</string>
     <string name="action_open">OPEN</string>
+    <string name="action_camera">CAMERA</string>
+
+    <string name="permisison_not_granted">Permissions are not granted!</string>
+    <string name="package_name">com.example.junemon.filteringimage.provider</string>
 </resources>

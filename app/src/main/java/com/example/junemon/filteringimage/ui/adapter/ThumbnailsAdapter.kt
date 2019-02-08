@@ -1,4 +1,4 @@
-package com.example.junemon.filteringimage.adapter
+package com.example.junemon.filteringimage.ui.adapter
 
 import android.content.Context
 import android.support.v4.content.ContextCompat
@@ -11,6 +11,7 @@ import com.zomato.photofilters.utils.ThumbnailItem
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_thumbnail_list.*
 import org.jetbrains.anko.textColor
+
 /**
  * Created by ian on 07/02/19.
  */

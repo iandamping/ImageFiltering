@@ -9,21 +9,26 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.example.junemon.filteringimage.MainApplication
 import com.example.junemon.filteringimage.MainApplication.Companion.IMAGE_NAME
+import com.example.junemon.filteringimage.MainApplication.Companion.RequestOpenCamera
 import com.example.junemon.filteringimage.MainApplication.Companion.RequestSelectGalleryImage
-import com.example.junemon.filteringimage.R
-import com.example.junemon.filteringimage.adapter.ViewPagerAdapter
+import com.example.junemon.filteringimage.MainApplication.Companion.maxHeight
+import com.example.junemon.filteringimage.MainApplication.Companion.maxWidth
+import com.example.junemon.filteringimage.MainApplication.Companion.nonVoidCustomMediaScannerConnection
+import com.example.junemon.filteringimage.helper.ImageUtils
+import com.example.junemon.filteringimage.ui.adapter.ViewPagerAdapter
 import com.example.junemon.filteringimage.ui.fragment.edit.EditImageFragment
 import com.example.junemon.filteringimage.ui.fragment.edit.EditImageListener
 import com.example.junemon.filteringimage.ui.fragment.filter.FragmentFilterList
 import com.example.junemon.filteringimage.ui.fragment.filter.FragmentFilterListener
-import com.example.junemon.filteringimage.helper.ImageUtils
 import com.zomato.photofilters.imageprocessors.Filter
 import com.zomato.photofilters.imageprocessors.subfilters.BrightnessSubFilter
 import com.zomato.photofilters.imageprocessors.subfilters.ContrastSubFilter
 import com.zomato.photofilters.imageprocessors.subfilters.SaturationSubfilter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+
 
 /**
  * Created by ian on 07/02/19.
@@ -41,7 +46,6 @@ class MainActivity : AppCompatActivity(), MainActivityView, FragmentFilterListen
         stat = status
     }
 
-    private val RequestPhotoPicker: Int = 23
     private lateinit var presenter: MainActivityPresenter
     private var originalImage: Bitmap? = null
     private var filteredImage: Bitmap? = null
@@ -58,7 +62,7 @@ class MainActivity : AppCompatActivity(), MainActivityView, FragmentFilterListen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(com.example.junemon.filteringimage.R.layout.activity_main)
         presenter = MainActivityPresenter(this, this)
         presenter.onCreate(this)
         presenter.getAllPermisions()
@@ -71,19 +75,23 @@ class MainActivity : AppCompatActivity(), MainActivityView, FragmentFilterListen
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.images_menu, menu)
+        menuInflater.inflate(com.example.junemon.filteringimage.R.menu.images_menu, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item?.itemId) {
-            R.id.action_open -> {
+            com.example.junemon.filteringimage.R.id.action_open -> {
                 presenter.openImageFromGallery(stat)
                 true
             }
 
-            R.id.action_save -> {
+            com.example.junemon.filteringimage.R.id.action_save -> {
                 presenter.saveImageToGallery(coordinator_layout, stat, finalImage)
+                true
+            }
+            com.example.junemon.filteringimage.R.id.action_camera -> {
+                invokeCamera()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -98,26 +106,47 @@ class MainActivity : AppCompatActivity(), MainActivityView, FragmentFilterListen
         filtersListFragment?.setListener(this)
         editImageFragment?.setListener(this)
 
-        vpAdapter.addFragment(filtersListFragment, getString(R.string.tab_filters))
-        vpAdapter.addFragment(editImageFragment, getString(R.string.tab_edit))
+        vpAdapter.addFragment(filtersListFragment, getString(com.example.junemon.filteringimage.R.string.tab_filters))
+        vpAdapter.addFragment(editImageFragment, getString(com.example.junemon.filteringimage.R.string.tab_edit))
         vp.adapter = vpAdapter
     }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RequestSelectGalleryImage && resultCode == Activity.RESULT_OK) {
-            val bitmap = BitmapUtils.getBitmapFromGallery(data?.data!!, 800, 800)
-            clearBitmapMemory()
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == RequestSelectGalleryImage) {
+                if (data != null) {
+                    val bitmap = BitmapUtils.getBitmapFromGallery(data.data!!, 800, 800)
+                    clearBitmapMemory()
 
-            originalImage = bitmap?.copy(Bitmap.Config.ARGB_8888, true)
-            filteredImage = originalImage?.copy(Bitmap.Config.ARGB_8888, true)
-            finalImage = originalImage?.copy(Bitmap.Config.ARGB_8888, true)
-            ivImagePreview.setImageBitmap(originalImage)
-            bitmap?.recycle()
+                    originalImage = bitmap?.copy(Bitmap.Config.ARGB_8888, true)
+                    filteredImage = originalImage?.copy(Bitmap.Config.ARGB_8888, true)
+                    finalImage = originalImage?.copy(Bitmap.Config.ARGB_8888, true)
+                    ivImagePreview.setImageBitmap(originalImage)
+                    bitmap?.recycle()
 
-            filtersListFragment?.prepareThumbnail(originalImage);
+                    filtersListFragment?.prepareThumbnail(originalImage)
+                }
+            } else if (requestCode == RequestOpenCamera) {
+                val bitmap = BitmapUtils.decodeSampledBitmapFromFile(
+                    nonVoidCustomMediaScannerConnection(
+                        this,
+                        MainApplication.saveCaptureImagePath
+                    ), reqWidth = maxWidth, reqHeight = maxHeight
+                )
+                clearBitmapMemory()
+
+                originalImage = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+                filteredImage = originalImage?.copy(Bitmap.Config.ARGB_8888, true)
+                finalImage = originalImage?.copy(Bitmap.Config.ARGB_8888, true)
+                ivImagePreview.setImageBitmap(originalImage)
+                bitmap.recycle()
+
+                filtersListFragment?.prepareThumbnail(originalImage)
+            }
         }
+
     }
 
 
@@ -189,4 +218,9 @@ class MainActivity : AppCompatActivity(), MainActivityView, FragmentFilterListen
         filteredImage?.recycle()
         finalImage?.recycle()
     }
+
+    private fun invokeCamera() {
+        presenter.openCamera(stat, BitmapUtils.createImageFileFromPhoto())
+    }
+
 }
